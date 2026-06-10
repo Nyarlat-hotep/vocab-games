@@ -17,6 +17,25 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build
+
+      # Encrypt the single-file build so the live site is unreadable without the
+      # password. Hard-fail if the secret is missing so we never publish in the
+      # clear. Set it once with: gh secret set STATICRYPT_PASSWORD
+      - name: Encrypt site
+        env:
+          STATICRYPT_PASSWORD: ${{ secrets.STATICRYPT_PASSWORD }}
+        run: |
+          if [ -z "$STATICRYPT_PASSWORD" ]; then
+            echo "::error::STATICRYPT_PASSWORD secret is not set — refusing to publish unencrypted."
+            exit 1
+          fi
+          npm run encrypt
+          # Sanity check: a known word must not survive in plaintext.
+          if grep -q "ephemeral" dist/index.html; then
+            echo "::error::Encryption sanity check failed — plaintext content detected."
+            exit 1
+          fi
+
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

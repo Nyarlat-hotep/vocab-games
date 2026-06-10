@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "build:wordbank": "node scripts/build-wordbank.mjs",
+    "encrypt": "staticrypt dist/index.html --short -d dist",
+    "build:secure": "vite build && npm run encrypt",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -23,6 +25,8 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
-    "vite": "^8.0.12"
+    "staticrypt": "^3.5.4",
+    "vite": "^8.0.12",
+    "vite-plugin-singlefile": "^2.3.3"
   }
 }

@@ -16,6 +16,9 @@ dist-ssr
 .env
 .env.local
 
+# StatiCrypt generated config (salt) — regenerated per build
+.staticrypt.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -36,6 +36,16 @@ npm run lint
 
 Push to `main`; GitHub Actions builds and publishes to the `gh-pages` branch. The Vite `base` is `/vocab-games/`.
 
+## Password protection
+
+The live site is **encrypted at rest** with [StatiCrypt](https://github.com/robinmoisson/staticrypt). The build inlines everything into a single `index.html` (via `vite-plugin-singlefile`), then that file is AES-encrypted. Visitors get a password prompt; the page decrypts in the browser. No server involved.
+
+- Set the password once as a GitHub Actions secret: `gh secret set STATICRYPT_PASSWORD`
+- The deploy **hard-fails if the secret is missing**, so the site can never publish in the clear.
+- Local encrypted build: `STATICRYPT_PASSWORD='…' npm run build:secure` (plain `npm run build` / `npm run dev` stay unencrypted for development).
+
+**Caveats:** the encrypted payload is public, so it's brute-forceable offline — use a long passphrase. And because the repo is public, anyone can clone the source and rebuild the app; the encryption protects the deployed URL, not the source.
+
 ## Tech
 
 React + Vite, plain CSS, no runtime backend.
