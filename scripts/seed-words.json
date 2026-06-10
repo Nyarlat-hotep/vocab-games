@@ -1,0 +1,38 @@
+{
+  "easy": [
+    "abandon", "ability", "absorb", "accept", "accurate", "achieve", "acquire", "adapt", "admire", "advance",
+    "adventure", "amaze", "ancient", "anxious", "apparent", "appreciate", "approach", "argue", "arrange", "assist",
+    "attempt", "attract", "available", "avoid", "aware", "balance", "barrier", "benefit", "blend", "bold",
+    "boost", "brave", "brief", "calm", "capable", "capture", "casual", "cautious", "cease", "challenge",
+    "charm", "cheerful", "clarify", "clever", "comfort", "commit", "compare", "compete", "complex", "concept",
+    "concern", "confident", "confuse", "connect", "consider", "constant", "contain", "convince", "courage", "create",
+    "curious", "decline", "defend", "delay", "delicate", "demand", "depend", "describe", "deserve", "desire",
+    "destroy", "detail", "devote", "discover", "distant", "doubt", "eager", "earn", "educate", "effort",
+    "elegant", "emerge", "emotion", "encourage", "endure", "enormous", "ensure", "envy", "escape", "establish",
+    "estimate", "evident", "examine", "exhaust", "expand", "explore", "express", "extend", "familiar", "fortune"
+  ],
+  "medium": [
+    "abstract", "accommodate", "acknowledge", "adamant", "adequate", "adjacent", "advocate", "aesthetic", "alleviate", "ambiguous",
+    "ambitious", "anonymous", "apparatus", "arbitrary", "articulate", "assert", "assess", "attribute", "authentic", "benevolent",
+    "bias", "bolster", "candid", "coherent", "coincide", "compatible", "compel", "competent", "complacent", "comply",
+    "comprehensive", "compromise", "conceal", "concise", "condemn", "conform", "conspicuous", "constitute", "contemplate", "contemporary",
+    "contradict", "controversial", "conventional", "credible", "cynical", "deceptive", "dedicate", "deficient", "deliberate", "denounce",
+    "deprive", "deteriorate", "deviate", "diligent", "diminish", "discreet", "disdain", "dismay", "disrupt", "diverse",
+    "dogmatic", "dubious", "eccentric", "elaborate", "eloquent", "elusive", "empirical", "endorse", "enhance", "enigma",
+    "entail", "evoke", "exemplify", "exhaustive", "exploit", "facilitate", "feasible", "fluctuate", "formidable", "frivolous",
+    "fundamental", "gregarious", "hierarchy", "hypocrisy", "hypothesis", "impartial", "implicit", "inadvertent", "incentive", "indifferent",
+    "inevitable", "infer", "innate", "innovative", "integrity", "intricate", "intrinsic", "lucid", "meticulous", "nuance"
+  ],
+  "hard": [
+    "aberration", "abnegation", "abstruse", "acrimonious", "alacrity", "anachronism", "antithesis", "approbation", "arcane", "ascetic",
+    "assiduous", "audacious", "austere", "avarice", "belligerent", "cacophony", "capricious", "castigate", "circumlocution", "circumspect",
+    "clandestine", "cogent", "complaisant", "conflagration", "confluence", "convoluted", "credulous", "cursory", "deference", "deleterious",
+    "demagogue", "deride", "desiccate", "desultory", "diaphanous", "diatribe", "didactic", "diffident", "dilatory", "disparate",
+    "dissemble", "dogmatism", "ebullient", "effervescent", "effrontery", "elegy", "enervate", "ephemeral", "epitome", "equanimity",
+    "erudite", "esoteric", "evanescent", "exacerbate", "exculpate", "extol", "fastidious", "fatuous", "fecund", "garrulous",
+    "germane", "grandiloquent", "hackneyed", "harangue", "iconoclast", "ignominious", "impecunious", "imperturbable", "impetuous", "inchoate",
+    "incontrovertible", "indolent", "ineffable", "inexorable", "ingenuous", "insidious", "intransigent", "inveterate", "laconic", "languid",
+    "largess", "loquacious", "magnanimous", "malevolent", "mellifluous", "mendacious", "mercurial", "munificent", "nefarious", "obdurate",
+    "obfuscate", "obsequious", "ostentatious", "pellucid", "perfidious", "perfunctory", "pernicious", "pertinacious", "phlegmatic", "pulchritude"
+  ]
+}
