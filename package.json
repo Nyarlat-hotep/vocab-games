@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:wordbank": "node scripts/build-wordbank.mjs",
-    "encrypt": "staticrypt dist/index.html --short -d dist",
+    "encrypt": "staticrypt dist/index.html --short -d dist -t staticrypt-template.html --template-title \"Vocab Games\" --template-instructions \"Enter the password to play.\" --template-button \"Unlock\" --template-placeholder \"Password\"",
     "build:secure": "vite build && npm run encrypt",
     "lint": "eslint .",
     "preview": "vite preview"
