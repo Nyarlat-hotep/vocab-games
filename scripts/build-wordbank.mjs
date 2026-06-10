@@ -112,7 +112,11 @@ async function buildWord(word, difficulty) {
     return null
   }
 
-  const definitions = (entry.shortdef || []).map(cleanText).filter(Boolean)
+  const definitions = (entry.shortdef || [])
+    .map(cleanText)
+    // MW appends ": such as" / trailing colons when subsenses follow — drop them.
+    .map((d) => d.replace(/\s*:\s*such as\s*$/i, '').replace(/\s*:\s*$/, '').trim())
+    .filter(Boolean)
   if (!definitions.length) {
     console.warn(`  - no definitions for "${word}" — skipped`)
     return null

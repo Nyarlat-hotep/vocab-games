@@ -34,66 +34,67 @@ export function getPool(difficulty, flag) {
   return wordBank.filter((w) => w[flag])
 }
 
-// Draw `n` distinct entries from `pool` excluding the target word.
-function sampleDistractors(pool, excludeWord, n) {
-  const others = shuffle(pool.filter((w) => w.word !== excludeWord))
-  return others.slice(0, n)
-}
-
 const firstDef = (w) => w.definitions[0]
+const norm = (s) => s.trim().toLowerCase()
 
 function frame(target) {
   return { word: target.word, partOfSpeech: target.partOfSpeech, definition: firstDef(target) }
+}
+
+// Assemble a 4-option set: the correct label plus distinct distractor labels.
+// `candidateLabels` is a preference-ordered list (long enough that dedupe still
+// reaches OPTIONS-1). Dedupe is by normalized text so two words that render the
+// same label — e.g. examples that blank to an identical sentence — can't both
+// appear. Returns the shuffled option list.
+function assembleOptions(correctLabel, candidateLabels) {
+  const seen = new Set([norm(correctLabel)])
+  const distractors = []
+  for (const label of candidateLabels) {
+    if (!label) continue
+    const key = norm(label)
+    if (seen.has(key)) continue
+    seen.add(key)
+    distractors.push(label)
+    if (distractors.length === OPTIONS - 1) break
+  }
+  return shuffle([
+    { label: correctLabel, correct: true },
+    ...distractors.map((label) => ({ label, correct: false })),
+  ])
+}
+
+// Words other than `target` with the flag, tier-first then whole-bank fallback,
+// so dedupe never starves the option set.
+function distractorWords(difficulty, flag, target, extraExclude = () => false) {
+  const ok = (w) => w.word !== target.word && w[flag] && !extraExclude(w)
+  return [...shuffle(getPool(difficulty, flag).filter(ok)), ...shuffle(wordBank.filter(ok))]
 }
 
 // --- per-game question builders ---------------------------------------------
 // Each returns { ...frame, prompt, options:[{label, correct}] }.
 
 export function makeSentenceQuestion(difficulty) {
-  const pool = getPool(difficulty, 'canSentence')
-  const target = pickRandom(pool)
-  const distractors = sampleDistractors(pool, target.word, OPTIONS - 1)
-  const options = shuffle([
-    { label: target.examples[0], correct: true },
-    ...distractors.map((d) => ({ label: d.examples[0], correct: false })),
-  ])
+  const target = pickRandom(getPool(difficulty, 'canSentence'))
+  const candidates = distractorWords(difficulty, 'canSentence', target).map((w) => w.examples[0])
+  const options = assembleOptions(target.examples[0], candidates)
   return { ...frame(target), prompt: 'Which sentence does this word complete?', options }
 }
 
 export function makeDefinitionQuestion(difficulty) {
-  const pool = getPool(difficulty, 'canDefinition')
-  const target = pickRandom(pool)
-  const distractors = sampleDistractors(pool, target.word, OPTIONS - 1)
-  const options = shuffle([
-    { label: firstDef(target), correct: true },
-    ...distractors.map((d) => ({ label: firstDef(d), correct: false })),
-  ])
+  const target = pickRandom(getPool(difficulty, 'canDefinition'))
+  const candidates = distractorWords(difficulty, 'canDefinition', target).map(firstDef)
+  const options = assembleOptions(firstDef(target), candidates)
   // Prompt shows the word itself, so don't repeat the definition in the frame.
   return { word: target.word, partOfSpeech: target.partOfSpeech, definition: null, prompt: 'What does this word mean?', options }
 }
 
 export function makeSynonymQuestion(difficulty) {
-  const pool = getPool(difficulty, 'canSynonym')
-  const target = pickRandom(pool)
+  const target = pickRandom(getPool(difficulty, 'canSynonym'))
   const correct = pickRandom(target.synonyms)
   // Distractors are unrelated words — never the target's own synonyms/antonyms.
-  const related = new Set([target.word, correct, ...target.synonyms, ...target.antonyms].map((s) => s.toLowerCase()))
-  const eligible = (w) => !related.has(w.word.toLowerCase())
-  // Prefer same-tier words, then top up from the whole bank so we always reach
-  // OPTIONS-1 distractors even when the tier is small and many words are related.
-  const tierFirst = [...shuffle(getPool(difficulty, 'canDefinition').filter(eligible)), ...shuffle(wordBank.filter(eligible))]
-  const distractors = []
-  const used = new Set()
-  for (const w of tierFirst) {
-    if (used.has(w.word)) continue
-    used.add(w.word)
-    distractors.push(w.word)
-    if (distractors.length === OPTIONS - 1) break
-  }
-  const options = shuffle([
-    { label: correct, correct: true },
-    ...distractors.map((label) => ({ label, correct: false })),
-  ])
+  const related = new Set([correct, ...target.synonyms, ...target.antonyms].map(norm))
+  const candidates = distractorWords(difficulty, 'canDefinition', target, (w) => related.has(norm(w.word))).map((w) => w.word)
+  const options = assembleOptions(correct, candidates)
   return { ...frame(target), prompt: 'Which word is the closest synonym?', options }
 }
 
