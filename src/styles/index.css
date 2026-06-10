@@ -40,6 +40,8 @@ body,
 
 body {
   margin: 0;
+  width: 100%;
+  overflow-x: hidden; /* guard against hard-shadow bleed causing horizontal scroll */
   background-color: var(--paper);
   /* faint engineering grid */
   background-image: linear-gradient(rgba(17, 17, 17, 0.05) 1px, transparent 1px),

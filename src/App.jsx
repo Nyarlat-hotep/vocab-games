@@ -11,7 +11,7 @@ export default function App() {
     <div className="app">
       <header className="app__header">
         <button className="app__title" onClick={() => setView({ name: 'home' })}>
-          <span className="app__title-mark">◆</span> Vocab Games
+          Vocab Games
         </button>
       </header>
 

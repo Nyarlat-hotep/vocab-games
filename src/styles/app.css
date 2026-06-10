@@ -460,3 +460,111 @@
 .btn--primary {
   background: var(--accent);
 }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 520px) {
+  .app {
+    padding: 0 12px 48px;
+  }
+
+  .app__header {
+    padding: 18px 0 10px;
+  }
+
+  .app__title {
+    font-size: 1.2rem;
+    padding: 9px 16px;
+  }
+
+  .home {
+    gap: 20px;
+    padding-top: 16px;
+  }
+
+  .home__lead {
+    font-size: 0.92rem;
+  }
+
+  .home__difficulty {
+    gap: 8px;
+  }
+
+  .pill {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+
+  .game-card {
+    padding: 18px;
+  }
+
+  .game-card__name {
+    font-size: 1.25rem;
+  }
+
+  .game-card__blurb {
+    font-size: 0.9rem;
+  }
+
+  /* Game bar: let the three groups wrap instead of overflowing */
+  .game__bar {
+    flex-wrap: wrap;
+    gap: 8px 10px;
+  }
+
+  .game__meta {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .game__score {
+    font-size: 1.2rem;
+  }
+
+  .card__frame {
+    padding: 18px;
+  }
+
+  .card__word {
+    font-size: 1.85rem;
+  }
+
+  .card__def {
+    font-size: 1rem;
+  }
+
+  .card__options {
+    gap: 12px;
+  }
+
+  .option {
+    padding: 14px;
+    font-size: 0.96rem;
+  }
+
+  /* Full-width action is a bigger tap target on phones */
+  .card__next {
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+  }
+
+  .summary {
+    padding-top: 28px;
+  }
+
+  .summary__score {
+    font-size: 3.2rem;
+    padding: 14px 24px;
+  }
+
+  .summary__actions {
+    width: 100%;
+  }
+
+  .summary__actions .btn {
+    flex: 1 1 0;
+    padding: 13px 12px;
+    text-align: center;
+  }
+}
