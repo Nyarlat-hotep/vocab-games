@@ -1,15 +1,16 @@
 :root {
-  /* palette — paper + ink, loud accents */
+  /* palette — paper + ink, orange accent */
   --paper: #f3efe2;
   --paper-2: #ffffff;
   --ink: #111111;
-  --accent: #ffd400; /* yellow */
-  --accent-2: #2b5cff; /* electric blue */
-  --easy: #19c37d;
-  --medium: #ffd400;
-  --hard: #ff4d6d;
+  --accent: #ff7a18; /* orange */
+  --accent-2: #c2410c; /* burnt orange */
+  --easy: #f5a623; /* amber */
+  --medium: #ff7a18; /* orange */
+  --hard: #e23b2e; /* red */
   --correct: #19c37d;
-  --wrong: #ff4d6d;
+  --wrong: #ff4d4d;
+  --grad: linear-gradient(90deg, #f5a623, #ff7a18, #e23b2e);
 
   /* brutalist primitives */
   --border: 3px solid var(--ink);
