@@ -104,18 +104,18 @@ const BUILDERS = {
   synonym: makeSynonymQuestion,
 }
 
-// A full round: `count` questions for the chosen game + difficulty, avoiding
-// back-to-back repeats of the same target word.
+// A full round: `count` questions for the chosen game + difficulty, with every
+// target word distinct (no repeats within a round, pool permitting).
 export function buildRound(gameId, difficulty, count = ROUND_LENGTH) {
   const build = BUILDERS[gameId]
   const questions = []
-  let lastWord = null
+  const used = new Set()
   let guard = 0
-  while (questions.length < count && guard < count * 20) {
+  while (questions.length < count && guard < count * 40) {
     guard++
     const q = build(difficulty)
-    if (q.word === lastWord) continue
-    lastWord = q.word
+    if (used.has(q.word)) continue
+    used.add(q.word)
     questions.push(q)
   }
   return questions

@@ -19,6 +19,9 @@ dist-ssr
 # StatiCrypt generated config (salt) — regenerated per build
 .staticrypt.json
 
+# Word bank fetch cache (local; rebuilt from wordBank.json if missing)
+scripts/wordbank-cache.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

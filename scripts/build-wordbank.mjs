@@ -3,6 +3,16 @@
 //
 // Run:  npm run build:wordbank   (loads keys from .env in project root)
 //
+// Caching: results are stored in scripts/wordbank-cache.json (gitignored). A
+// re-run only fetches seed words not already in the cache, so growing the seed
+// list is cheap and the per-run work shrinks to just the new words. The cache
+// also remembers "skips" (words with no usable data) so they aren't re-fetched.
+//
+// Daily budget: MW's free tier allows 1000 queries/day per reference. Each word
+// costs one Dictionary + one Thesaurus query, so a run fetches at most
+// WORDBANK_DAILY_LIMIT new words (default 900). If more remain, run again the
+// next day — the cache picks up where it left off.
+//
 // Needs Node 18+ (global fetch). Keys: MW_DICT_KEY, MW_THESAURUS_KEY.
 // Output: src/data/wordBank.json
 
@@ -12,6 +22,11 @@ import { dirname, join } from 'node:path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
+const SEED_PATH = join(ROOT, 'scripts', 'seed-words.json')
+const CACHE_PATH = join(ROOT, 'scripts', 'wordbank-cache.json')
+const OUT_PATH = join(ROOT, 'src', 'data', 'wordBank.json')
+const TIERS = ['easy', 'medium', 'hard']
+const DAILY_LIMIT = Number(process.env.WORDBANK_DAILY_LIMIT) || 900
 
 // --- tiny .env loader (avoids a dependency; ignores missing file) ---
 function loadEnv() {
@@ -41,6 +56,8 @@ const THES_URL = (w) =>
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
+// Throws on non-OK / unparseable responses — callers treat these as transient
+// (e.g. daily quota hit) and abort the run rather than caching a bad result.
 async function getJson(url) {
   const res = await fetch(url)
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -91,36 +108,24 @@ function pickEntry(entries, word) {
   return exact || entries[0]
 }
 
-async function buildWord(word, difficulty) {
-  let dict, thes
-  try {
-    dict = await getJson(DICT_URL(word))
-  } catch (e) {
-    console.warn(`  ! dict fetch failed for "${word}": ${e.message}`)
-    return null
-  }
+// Fetch + normalize one word. Returns { entry } on success or { skip, reason }
+// when the word has no usable data. Throws on transient network/HTTP errors so
+// the caller can abort and resume later without caching a bad result. The
+// returned entry has no `difficulty` — that's applied from the seed at assembly.
+async function fetchWord(word) {
+  const dict = await getJson(DICT_URL(word)) // transient errors propagate
   await sleep(120)
-  try {
-    thes = await getJson(THES_URL(word))
-  } catch {
-    thes = []
-  }
+  const thes = await getJson(THES_URL(word)) // transient errors propagate
 
   const entry = pickEntry(dict, word)
-  if (!entry) {
-    console.warn(`  - no dictionary entry for "${word}" (suggestions only) — skipped`)
-    return null
-  }
+  if (!entry) return { skip: true, reason: 'no-entry' }
 
   const definitions = (entry.shortdef || [])
     .map(cleanText)
     // MW appends ": such as" / trailing colons when subsenses follow — drop them.
     .map((d) => d.replace(/\s*:\s*such as\s*$/i, '').replace(/\s*:\s*$/, '').trim())
     .filter(Boolean)
-  if (!definitions.length) {
-    console.warn(`  - no definitions for "${word}" — skipped`)
-    return null
-  }
+  if (!definitions.length) return { skip: true, reason: 'no-def' }
 
   const rawVis = []
   collectVis(entry.def, rawVis)
@@ -136,46 +141,98 @@ async function buildWord(word, difficulty) {
   const dedupe = (arr) => [...new Set(arr.map((w) => w.toLowerCase()))]
 
   return {
-    word,
-    difficulty,
-    partOfSpeech: cleanText(entry.fl || ''),
-    definitions,
-    examples,
-    synonyms: dedupe(synonyms).slice(0, 8),
-    antonyms: dedupe(antonyms).slice(0, 8),
-    canSentence: examples.length > 0,
-    canDefinition: true,
-    canSynonym: synonyms.length > 0,
+    entry: {
+      word,
+      partOfSpeech: cleanText(entry.fl || ''),
+      definitions,
+      examples,
+      synonyms: dedupe(synonyms).slice(0, 8),
+      antonyms: dedupe(antonyms).slice(0, 8),
+      canSentence: examples.length > 0,
+      canDefinition: true,
+      canSynonym: synonyms.length > 0,
+    },
   }
 }
 
-async function main() {
-  const seed = JSON.parse(readFileSync(join(ROOT, 'scripts', 'seed-words.json'), 'utf8'))
-  const tiers = ['easy', 'medium', 'hard']
-  const bank = []
-
-  for (const tier of tiers) {
-    const words = seed[tier] || []
-    console.log(`\n=== ${tier} (${words.length} words) ===`)
-    for (const word of words) {
-      const entry = await buildWord(word.trim().toLowerCase(), tier)
-      if (entry) {
-        bank.push(entry)
-        process.stdout.write('.')
-      }
-      await sleep(120)
+// Ordered, de-duplicated [{ word, tier }] from the seed (first tier wins).
+function loadSeed() {
+  const seed = JSON.parse(readFileSync(SEED_PATH, 'utf8'))
+  const out = []
+  const seen = new Set()
+  for (const tier of TIERS) {
+    for (const raw of seed[tier] || []) {
+      const word = raw.trim().toLowerCase()
+      if (!word || seen.has(word)) continue
+      seen.add(word)
+      out.push({ word, tier })
     }
   }
+  return out
+}
 
-  const outDir = join(ROOT, 'src', 'data')
-  const outPath = join(outDir, 'wordBank.json')
-  writeFileSync(outPath, JSON.stringify(bank, null, 0) + '\n')
+// Load the fetch cache. If absent, seed it from a previously-built wordBank.json
+// so already-shipped words are never re-fetched after a cache wipe.
+function loadCache() {
+  if (existsSync(CACHE_PATH)) return JSON.parse(readFileSync(CACHE_PATH, 'utf8'))
+  const cache = {}
+  if (existsSync(OUT_PATH)) {
+    for (const e of JSON.parse(readFileSync(OUT_PATH, 'utf8'))) {
+      const { difficulty, ...rest } = e // difficulty comes from the seed, not the cache
+      cache[e.word] = rest
+    }
+    console.log(`Migrated ${Object.keys(cache).length} existing words into a new cache.`)
+  }
+  return cache
+}
+
+const saveCache = (cache) => writeFileSync(CACHE_PATH, JSON.stringify(cache))
+
+async function main() {
+  const seed = loadSeed()
+  const cache = loadCache()
+
+  const toFetch = seed.filter(({ word }) => !(word in cache))
+  const fetchNow = toFetch.slice(0, DAILY_LIMIT)
+  const deferred = toFetch.length - fetchNow.length
+
+  console.log(`Seed: ${seed.length} words | cached: ${seed.length - toFetch.length} | to fetch: ${toFetch.length}`)
+  if (fetchNow.length) console.log(`Fetching up to ${fetchNow.length} new word(s) this run (daily limit ${DAILY_LIMIT})...\n`)
+
+  let fetched = 0
+  let aborted = false
+  for (const { word } of fetchNow) {
+    try {
+      const res = await fetchWord(word)
+      cache[word] = res.entry ?? { skip: true, reason: res.reason }
+      process.stdout.write(res.entry ? '.' : 'x')
+    } catch (e) {
+      console.warn(`\n! fetch error on "${word}" (${e.message}) — likely the daily quota. Saving progress and stopping.`)
+      aborted = true
+      break
+    }
+    fetched++
+    if (fetched % 25 === 0) saveCache(cache)
+    await sleep(120)
+  }
+  saveCache(cache)
+
+  // Assemble the shipped bank from the cache, applying difficulty from the seed.
+  const bank = []
+  for (const { word, tier } of seed) {
+    const c = cache[word]
+    if (c && !c.skip) bank.push({ ...c, difficulty: tier })
+  }
+  writeFileSync(OUT_PATH, JSON.stringify(bank, null, 0) + '\n')
 
   const stat = (flag) => bank.filter((e) => e[flag]).length
-  console.log(`\n\nWrote ${bank.length} words to ${outPath}`)
+  console.log(`\n\nWrote ${bank.length} words to ${OUT_PATH}`)
+  console.log(`  fetched this run:    ${fetched}`)
   console.log(`  sentence-eligible:   ${stat('canSentence')}`)
   console.log(`  synonym-eligible:    ${stat('canSynonym')}`)
-  for (const tier of tiers) console.log(`  ${tier}: ${bank.filter((e) => e.difficulty === tier).length}`)
+  for (const tier of TIERS) console.log(`  ${tier}: ${bank.filter((e) => e.difficulty === tier).length}`)
+  const remaining = deferred + (aborted ? fetchNow.length - fetched : 0)
+  if (remaining > 0) console.log(`\n${remaining} seed word(s) still need fetching — run \`npm run build:wordbank\` again.`)
 }
 
 main().catch((e) => {
