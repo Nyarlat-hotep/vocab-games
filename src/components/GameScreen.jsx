@@ -16,18 +16,12 @@ export default function GameScreen({ gameId, difficulty, onHome }) {
   const [round, setRound] = useState(() => buildRound(gameId, difficulty))
   const [index, setIndex] = useState(0)
   const [score, setScore] = useState(0)
-  const [streak, setStreak] = useState(0)
   const [finished, setFinished] = useState(false)
   // Best score *before* this round — what the player is trying to beat.
   const [best, setBest] = useState(() => readBest(gameId, difficulty))
 
   function handleAnswer(correct) {
-    if (correct) {
-      setScore((s) => s + 1)
-      setStreak((s) => s + 1)
-    } else {
-      setStreak(0)
-    }
+    if (correct) setScore((s) => s + 1)
   }
 
   function handleNext() {
@@ -44,7 +38,6 @@ export default function GameScreen({ gameId, difficulty, onHome }) {
     setRound(buildRound(gameId, difficulty))
     setIndex(0)
     setScore(0)
-    setStreak(0)
     setFinished(false)
   }
 
@@ -73,7 +66,6 @@ export default function GameScreen({ gameId, difficulty, onHome }) {
         </span>
         <span className="game__stats">
           <span className="game__score">{score}</span>
-          {streak >= 2 && <span className="game__streak">🔥 {streak}</span>}
         </span>
       </div>
 

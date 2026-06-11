@@ -205,12 +205,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.game__streak {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
 .tag {
   font-family: var(--font-mono);
   text-transform: uppercase;
