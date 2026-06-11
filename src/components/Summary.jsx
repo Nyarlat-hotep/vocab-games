@@ -1,3 +1,5 @@
+import { Trophy } from '@phosphor-icons/react'
+
 export default function Summary({ gameName, difficulty, score, total, best, onReplay, onHome }) {
   const pct = Math.round((score / total) * 100)
   const isBest = score > best && score > 0
@@ -16,7 +18,13 @@ export default function Summary({ gameName, difficulty, score, total, best, onRe
       </div>
       <p className="summary__note">{note}</p>
       <p className="summary__best">
-        {isBest ? '🏆 New best!' : `Best: ${bestSoFar} / ${total}`}
+        {isBest ? (
+          <>
+            <Trophy weight="fill" size={18} color="#ff7a18" /> New best!
+          </>
+        ) : (
+          `Best: ${bestSoFar} / ${total}`
+        )}
       </p>
       <div className="summary__actions">
         <button className="btn btn--primary" onClick={onReplay}>
