@@ -3,7 +3,7 @@
 
 import wordBank from '../data/wordBank.json'
 
-export const DIFFICULTIES = ['easy', 'medium', 'hard']
+export const DIFFICULTIES = ['medium', 'hard']
 
 export const GAMES = {
   sentence: { id: 'sentence', name: 'Sentence Fit', flag: 'canSentence', blurb: 'Pick the sentence the word completes.' },
