@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ArrowRight, CheckCircle } from '@phosphor-icons/react'
 
 // Renders one question: the word/definition frame plus the answer options.
 // Reveals correctness on selection, then surfaces a Next button.
@@ -42,7 +43,11 @@ export default function QuestionCard({ question, onAnswer, onNext, isLast }) {
 
       {answered && (
         <button className="card__next" onClick={onNext}>
-          {isLast ? 'See results' : 'Next →'}
+          {isLast ? (
+            <>See results <CheckCircle weight="bold" size={20} /></>
+          ) : (
+            <>Next <ArrowRight weight="bold" size={20} /></>
+          )}
         </button>
       )}
     </div>

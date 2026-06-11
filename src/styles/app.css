@@ -357,6 +357,9 @@
 
 .card__next {
   align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: var(--accent-2);
   color: var(--paper);
   border: var(--border-thick);
@@ -542,7 +545,7 @@
   /* Full-width action is a bigger tap target on phones */
   .card__next {
     width: 100%;
-    text-align: center;
+    justify-content: center;
     padding: 14px;
   }
 
