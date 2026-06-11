@@ -161,13 +161,15 @@
 }
 
 .game__quit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
   background: var(--paper-2);
   border: var(--border);
   box-shadow: var(--shadow-sm);
-  padding: 7px 14px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  text-transform: uppercase;
+  color: var(--ink);
+  line-height: 0;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
@@ -262,7 +264,8 @@
 
 .card__word-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ArrowLeft } from '@phosphor-icons/react'
 import { GAMES, ROUND_LENGTH, buildRound } from '../lib/bank'
 import QuestionCard from './QuestionCard'
 import Summary from './Summary'
@@ -64,8 +65,8 @@ export default function GameScreen({ gameId, difficulty, onHome }) {
   return (
     <div className="game">
       <div className="game__bar">
-        <button className="game__quit" onClick={onHome}>
-          ← Quit
+        <button className="game__quit" onClick={onHome} aria-label="Quit game">
+          <ArrowLeft weight="bold" size={22} />
         </button>
         <span className="game__meta">
           {game.name} · <span className={`tag tag--${difficulty}`}>{difficulty}</span>
