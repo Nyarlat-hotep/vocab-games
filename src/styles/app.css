@@ -197,11 +197,18 @@
 }
 
 .game__score {
+  /* Match the quit button's box (8px padding + 3px border around a 22px icon
+     = 44px square), minus the box-shadow. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: var(--border);
   font-family: var(--font-display);
   font-size: 1.4rem;
   background: var(--ink);
   color: var(--paper);
-  padding: 2px 12px;
   font-variant-numeric: tabular-nums;
 }
 
