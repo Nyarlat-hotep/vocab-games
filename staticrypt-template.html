@@ -45,6 +45,27 @@
                 margin: 0;
             }
 
+            .staticrypt-html {
+                scrollbar-gutter: stable;
+                scrollbar-color: var(--accent) var(--paper);
+            }
+            ::-webkit-scrollbar {
+                width: 14px;
+                height: 14px;
+            }
+            ::-webkit-scrollbar-track {
+                background: var(--paper);
+                border-left: 2px solid var(--ink);
+            }
+            ::-webkit-scrollbar-thumb {
+                background: var(--accent);
+                border: 2px solid var(--ink);
+                background-clip: padding-box;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--accent-2);
+            }
+
             #staticrypt_content {
                 height: 100%;
                 display: flex;
