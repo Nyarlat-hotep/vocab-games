@@ -1,15 +1,10 @@
 // Single source of truth for gameplay data. Reads the static word bank baked at
-// build time and exposes helpers all three games share. No network, no API key.
+// build time and exposes helpers the vocab quizzes and the memory games share.
+// No network, no API key. The game menu itself lives in `games.js`.
 
 import wordBank from '../data/wordBank.json'
 
-export const DIFFICULTIES = ['medium', 'hard']
-
-export const GAMES = {
-  sentence: { id: 'sentence', name: 'Sentence Fit', flag: 'canSentence', blurb: 'Pick the sentence the word completes.' },
-  definition: { id: 'definition', name: 'Definition Match', flag: 'canDefinition', blurb: 'Match the word to its meaning.' },
-  synonym: { id: 'synonym', name: 'Synonym Pick', flag: 'canSynonym', blurb: 'Choose the closest synonym.' },
-}
+export { wordBank }
 
 export const ROUND_LENGTH = 10
 const OPTIONS = 4
@@ -34,8 +29,8 @@ export function getPool(difficulty, flag) {
   return wordBank.filter((w) => w[flag])
 }
 
-const firstDef = (w) => w.definitions[0]
-const norm = (s) => s.trim().toLowerCase()
+export const firstDef = (w) => w.definitions[0]
+export const norm = (s) => s.trim().toLowerCase()
 
 function frame(target) {
   return { word: target.word, partOfSpeech: target.partOfSpeech, definition: firstDef(target) }
@@ -46,7 +41,7 @@ function frame(target) {
 // reaches OPTIONS-1). Dedupe is by normalized text so two words that render the
 // same label — e.g. examples that blank to an identical sentence — can't both
 // appear. Returns the shuffled option list.
-function assembleOptions(correctLabel, candidateLabels) {
+export function assembleOptions(correctLabel, candidateLabels) {
   const seen = new Set([norm(correctLabel)])
   const distractors = []
   for (const label of candidateLabels) {
@@ -65,7 +60,7 @@ function assembleOptions(correctLabel, candidateLabels) {
 
 // Words other than `target` with the flag, tier-first then whole-bank fallback,
 // so dedupe never starves the option set.
-function distractorWords(difficulty, flag, target, extraExclude = () => false) {
+export function distractorWords(difficulty, flag, target, extraExclude = () => false) {
   const ok = (w) => w.word !== target.word && w[flag] && !extraExclude(w)
   return [...shuffle(getPool(difficulty, flag).filter(ok)), ...shuffle(wordBank.filter(ok))]
 }

@@ -1,7 +1,13 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { ArrowLeft } from '@phosphor-icons/react'
-import { GAMES, ROUND_LENGTH, buildRound } from '../lib/bank'
-import QuestionCard from './QuestionCard'
+import { GAMES } from '../lib/games'
+import QuizGame from './QuizGame'
+import WordSpan from './memory/WordSpan'
+import GridFlash from './memory/GridFlash'
+import PatternMatrix from './memory/PatternMatrix'
+import LexiconRecall from './memory/LexiconRecall'
+import Concentration from './memory/Concentration'
+import PairBond from './memory/PairBond'
 import Summary from './Summary'
 
 const bestKey = (gameId, difficulty) => `vocab-games:best:${gameId}:${difficulty}`
@@ -11,43 +17,56 @@ function readBest(gameId, difficulty) {
   return Number.isFinite(v) ? v : 0
 }
 
+// Every renderer takes { gameId, difficulty, onFinish, onScore } and reports
+// back { score, total, unit, detail? }. `unit` is 'correct' for fixed-length
+// games and 'span' for the adaptive ones, which have no denominator.
+const RENDERERS = {
+  quiz: QuizGame,
+  wordspan: WordSpan,
+  gridflash: GridFlash,
+  matrix: PatternMatrix,
+  lexicon: LexiconRecall,
+  concentration: Concentration,
+  pairbond: PairBond,
+}
+
 export default function GameScreen({ gameId, difficulty, onHome }) {
   const game = GAMES[gameId]
-  const [round, setRound] = useState(() => buildRound(gameId, difficulty))
-  const [index, setIndex] = useState(0)
-  const [score, setScore] = useState(0)
-  const [finished, setFinished] = useState(false)
+  const Renderer = RENDERERS[game.kind]
+
+  // Bumped so each round remounts the renderer with fresh internal state.
+  const [runId, setRunId] = useState(0)
+  const [hudScore, setHudScore] = useState(0)
+  const [result, setResult] = useState(null)
   // Best score *before* this round — what the player is trying to beat.
   const [best, setBest] = useState(() => readBest(gameId, difficulty))
 
-  function handleAnswer(correct) {
-    if (correct) setScore((s) => s + 1)
-  }
-
-  function handleNext() {
-    if (index + 1 >= round.length) {
-      if (score > best) localStorage.setItem(bestKey(gameId, difficulty), String(score))
-      setFinished(true)
-    } else {
-      setIndex((i) => i + 1)
-    }
-  }
+  // Stable identity: the memory games hold this in timer effects, and a new
+  // function every render would restart their feedback timeouts.
+  const handleFinish = useCallback(
+    (next) => {
+      if (next.score > best) localStorage.setItem(bestKey(gameId, difficulty), String(next.score))
+      setResult(next)
+    },
+    [best, gameId, difficulty],
+  )
 
   function replay() {
     setBest(readBest(gameId, difficulty))
-    setRound(buildRound(gameId, difficulty))
-    setIndex(0)
-    setScore(0)
-    setFinished(false)
+    setResult(null)
+    setHudScore(0)
+    setRunId((r) => r + 1)
   }
 
-  if (finished) {
+  if (result) {
     return (
       <Summary
         gameName={game.name}
         difficulty={difficulty}
-        score={score}
-        total={round.length}
+        score={result.score}
+        total={result.total}
+        unit={result.unit}
+        detail={result.detail}
         best={best}
         onReplay={replay}
         onHome={onHome}
@@ -65,23 +84,16 @@ export default function GameScreen({ gameId, difficulty, onHome }) {
           {game.name} · <span className={`tag tag--${difficulty}`}>{difficulty}</span>
         </span>
         <span className="game__stats">
-          <span className="game__score">{score}</span>
+          <span className="game__score">{hudScore}</span>
         </span>
       </div>
 
-      <div className="game__progress">
-        <div className="game__progress-fill" style={{ width: `${(index / ROUND_LENGTH) * 100}%` }} />
-      </div>
-      <p className="game__count">
-        Question {index + 1} of {round.length}
-      </p>
-
-      <QuestionCard
-        key={index}
-        question={round[index]}
-        onAnswer={handleAnswer}
-        onNext={handleNext}
-        isLast={index + 1 >= round.length}
+      <Renderer
+        key={runId}
+        gameId={gameId}
+        difficulty={difficulty}
+        onFinish={handleFinish}
+        onScore={setHudScore}
       />
     </div>
   )

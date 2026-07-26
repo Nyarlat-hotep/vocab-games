@@ -105,6 +105,22 @@
   background: var(--hard);
 }
 
+.home__section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home__section-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  border-bottom: var(--border);
+  padding-bottom: 6px;
+}
+
 .home__games {
   display: flex;
   flex-direction: column;
@@ -388,6 +404,441 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* ---------- Memory games ---------- */
+.memory {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.memory__skip,
+.memory__hint,
+.memory__answer {
+  align-self: center;
+}
+
+.memory__hint,
+.memory__answer {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.memory__answer {
+  font-weight: 700;
+  word-break: break-word;
+}
+
+/* Phase banner */
+.phase {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phase__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.phase__label {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.phase__note {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Timed phases drain this bar with a CSS animation rather than a JS tick — the
+   duration comes from an inline animation-duration, so nothing re-renders. */
+.phase__timer {
+  height: 18px;
+  background: var(--paper-2);
+  border: var(--border);
+  padding: 2px;
+  overflow: hidden;
+}
+
+.phase__timer-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--grad);
+  transform-origin: left center;
+  animation: phase-drain linear forwards;
+}
+
+@keyframes phase-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Cell grid — Grid Flash, Pattern Matrix */
+.cellgrid {
+  display: grid;
+  gap: 10px;
+  background: var(--paper-2);
+  border: var(--border-thick);
+  box-shadow: var(--shadow);
+  padding: 12px;
+}
+
+.cellgrid--correct {
+  background: var(--correct);
+}
+
+.cellgrid--wrong {
+  background: var(--wrong);
+}
+
+.cellgrid__cell {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--paper);
+  border: var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+}
+
+.cellgrid__cell:hover:not(:disabled) {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow);
+  background: var(--accent);
+}
+
+.cellgrid__cell:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.cellgrid__cell--lit {
+  background: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translate(-2px, -2px);
+}
+
+.cellgrid__cell--tapped {
+  background: var(--ink);
+  box-shadow: 1px 1px 0 var(--ink);
+  transform: translate(2px, 2px);
+}
+
+.cellgrid__ord {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--paper);
+}
+
+/* Flashed word — Word Span present phase */
+.flashword {
+  background: var(--paper-2);
+  border: var(--border-thick);
+  box-shadow: var(--shadow);
+  padding: 40px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  min-height: 190px;
+  justify-content: space-between;
+}
+
+.flashword--correct {
+  background: var(--correct);
+}
+
+.flashword--wrong {
+  background: var(--wrong);
+}
+
+.flashword__word {
+  font-family: var(--font-display);
+  font-size: 2.3rem;
+  line-height: 1;
+  text-transform: uppercase;
+  text-align: center;
+  word-break: break-word;
+  min-height: 1em;
+}
+
+.flashword__dots {
+  display: flex;
+  gap: 8px;
+}
+
+.flashword__dot {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--ink);
+  background: transparent;
+}
+
+.flashword__dot--on {
+  background: var(--ink);
+}
+
+/* Word tiles — Word Span recall phase */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.tile {
+  position: relative;
+  background: var(--paper-2);
+  border: var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius: 0;
+  padding: 16px 14px;
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 700;
+  word-break: break-word;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+}
+
+.tile:hover:not(:disabled) {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow);
+  background: var(--accent);
+}
+
+.tile:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.tile--tapped {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 1px 1px 0 var(--ink);
+  transform: translate(2px, 2px);
+}
+
+.tile__ord {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+}
+
+/* Study lists — Lexicon Recall, Pair Bond */
+.study-list {
+  background: var(--paper-2);
+  border: var(--border-thick);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.study-list__word {
+  border: 2px solid var(--ink);
+  padding: 6px 12px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.study-pairs {
+  background: var(--paper-2);
+  border: var(--border-thick);
+  box-shadow: var(--shadow);
+  padding: 8px 20px;
+}
+
+.study-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 0;
+  border-bottom: 2px solid var(--ink);
+}
+
+.study-pair:last-child {
+  border-bottom: 0;
+}
+
+.study-pair__word {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+
+.study-pair__meaning {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Single-word probe + SEEN/NEW — Lexicon Recall test phase */
+.probe {
+  background: var(--paper-2);
+  border: var(--border-thick);
+  box-shadow: var(--shadow);
+  padding: 44px 24px;
+  display: grid;
+  place-items: center;
+}
+
+.probe__word {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  line-height: 1;
+  text-transform: uppercase;
+  text-align: center;
+  word-break: break-word;
+}
+
+.binary-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.binary-choice__btn {
+  background: var(--paper-2);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-sm);
+  border-radius: 0;
+  padding: 18px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+}
+
+.binary-choice__btn:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow);
+  background: var(--accent);
+}
+
+.binary-choice__btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+/* Concentration */
+.flipgrid {
+  display: grid;
+  gap: 10px;
+}
+
+.flipcard {
+  aspect-ratio: 3 / 4;
+  border: var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+  padding: 8px 6px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  word-break: break-word;
+  hyphens: auto;
+  /* Face-down cards reuse the engineering grid from index.css. */
+  background-color: var(--paper);
+  background-image: linear-gradient(rgba(17, 17, 17, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.05) 1px, transparent 1px);
+  background-size: 13px 13px;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.08s ease;
+}
+
+.flipcard:hover:not(:disabled) {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow);
+  background-color: var(--accent);
+}
+
+.flipcard:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.flipcard--faceup {
+  background-image: none;
+  background-color: var(--paper-2);
+}
+
+.flipcard--faceup.flipcard--word {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.flipcard--faceup.flipcard--meaning {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.flipcard--matched {
+  background-color: var(--correct);
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+/* Pair Bond interference task */
+.glyphrow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.glyphrow__btn {
+  aspect-ratio: 1;
+  background: var(--paper-2);
+  border: var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+}
+
+.glyphrow__btn:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow);
+  background: var(--accent);
+}
+
+.glyphrow__btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
 /* ---------- Summary ---------- */
 .summary {
   text-align: center;
@@ -418,6 +869,23 @@
 .summary__total {
   font-size: 1.6rem;
   margin-left: 8px;
+}
+
+/* Span games have no denominator, so the unit sits above the number instead. */
+.summary__unit {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 4px;
+}
+
+.summary__detail {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .summary__note {
@@ -576,5 +1044,90 @@
     flex: 1 1 0;
     padding: 13px 12px;
     text-align: center;
+  }
+
+  /* Memory games. The 5×5 hard grid is the tightest constraint — shrink the
+     gaps and padding so the grid stays square rather than forcing a scroll. */
+  .phase__label {
+    font-size: 1rem;
+  }
+
+  .phase__note {
+    font-size: 0.72rem;
+  }
+
+  .cellgrid {
+    gap: 7px;
+    padding: 8px;
+  }
+
+  .flashword {
+    padding: 30px 16px 20px;
+    min-height: 160px;
+  }
+
+  .flashword__word {
+    font-size: 1.85rem;
+  }
+
+  .tiles {
+    gap: 10px;
+  }
+
+  .tile {
+    padding: 14px 12px;
+    font-size: 0.9rem;
+  }
+
+  .study-list,
+  .study-pairs {
+    padding: 14px;
+  }
+
+  .probe {
+    padding: 34px 16px;
+  }
+
+  .probe__word {
+    font-size: 1.7rem;
+  }
+
+  .binary-choice__btn {
+    padding: 15px;
+    font-size: 0.95rem;
+  }
+
+  .flipgrid {
+    gap: 7px;
+  }
+
+  .flipcard--faceup.flipcard--word {
+    font-size: 0.72rem;
+  }
+
+  .flipcard--faceup.flipcard--meaning {
+    font-size: 0.62rem;
+  }
+
+  .glyphrow {
+    gap: 7px;
+  }
+}
+
+/* Sequences are the app's first real motion. Reduced motion keeps the sequence
+   (it *is* the game) and drops the easing — useSequencePlayer lengthens the
+   holds to compensate. */
+@media (prefers-reduced-motion: reduce) {
+  .cellgrid__cell,
+  .tile,
+  .flipcard,
+  .binary-choice__btn,
+  .glyphrow__btn,
+  .game__progress-fill {
+    transition: none;
+  }
+
+  .cellgrid__cell--lit {
+    transform: none;
   }
 }

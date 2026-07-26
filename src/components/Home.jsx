@@ -1,14 +1,12 @@
 import { useState } from 'react'
-import { GAMES, DIFFICULTIES } from '../lib/bank'
-
-const GAME_LIST = Object.values(GAMES)
+import { CATEGORIES, GAMES_BY_CATEGORY, DIFFICULTIES } from '../lib/games'
 
 export default function Home({ onStart }) {
   const [difficulty, setDifficulty] = useState('medium')
 
   return (
     <div className="home">
-      <p className="home__lead">Practice your vocabulary. Pick a difficulty, then a game.</p>
+      <p className="home__lead">Train your vocabulary and your memory. Pick a difficulty, then a game.</p>
 
       <div className="home__difficulty" role="group" aria-label="Difficulty">
         {DIFFICULTIES.map((d) => (
@@ -22,14 +20,19 @@ export default function Home({ onStart }) {
         ))}
       </div>
 
-      <div className="home__games">
-        {GAME_LIST.map((g) => (
-          <button key={g.id} className="game-card" onClick={() => onStart(g.id, difficulty)}>
-            <span className="game-card__name">{g.name}</span>
-            <span className="game-card__blurb">{g.blurb}</span>
-          </button>
-        ))}
-      </div>
+      {CATEGORIES.map((cat) => (
+        <section key={cat.id} className="home__section">
+          <h2 className="home__section-title">{cat.label}</h2>
+          <div className="home__games">
+            {GAMES_BY_CATEGORY[cat.id].map((g) => (
+              <button key={g.id} className="game-card" onClick={() => onStart(g.id, difficulty)}>
+                <span className="game-card__name">{g.name}</span>
+                <span className="game-card__blurb">{g.blurb}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   )
 }
