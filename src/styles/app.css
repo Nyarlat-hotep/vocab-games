@@ -799,7 +799,7 @@
 
 .flipcard--faceup.flipcard--meaning {
   font-family: var(--font-body);
-  font-size: 0.72rem;
+  font-size: 0.92rem;
   font-weight: 500;
   line-height: 1.25;
 }
@@ -1106,7 +1106,7 @@
   }
 
   .flipcard--faceup.flipcard--meaning {
-    font-size: 0.62rem;
+    font-size: 0.78rem;
   }
 
   .glyphrow {
