@@ -6,13 +6,16 @@ import { wordBank, getPool, shuffle, pickRandom, firstDef, norm } from './bank'
 // --- difficulty params -------------------------------------------------------
 
 export const PARAMS = {
+  // `max` caps the sequence length. Past it the run continues at that length
+  // until you miss out — see useSpanLadder. Pattern Matrix is deliberately
+  // uncapped: order doesn't count there, so it climbs more gently on its own.
   wordspan: {
-    medium: { start: 3, reverse: false, onMs: 900, offMs: 250, extraTiles: 3 },
-    hard: { start: 3, reverse: true, onMs: 750, offMs: 200, extraTiles: 4 },
+    medium: { start: 3, max: 5, reverse: false, onMs: 900, offMs: 250, extraTiles: 3 },
+    hard: { start: 3, max: 5, reverse: true, onMs: 750, offMs: 200, extraTiles: 4 },
   },
   gridflash: {
-    medium: { start: 3, reverse: false, size: 4, onMs: 600, offMs: 200 },
-    hard: { start: 3, reverse: true, size: 5, onMs: 500, offMs: 160 },
+    medium: { start: 3, max: 6, reverse: false, size: 4, onMs: 600, offMs: 200 },
+    hard: { start: 3, max: 6, reverse: true, size: 5, onMs: 500, offMs: 160 },
   },
   matrix: {
     medium: { start: 3, size: 4, studyMs: 2500 },

@@ -62,6 +62,9 @@ export default function PatternMatrix({ difficulty, onFinish, onScore }) {
   // On feedback, show the real pattern so a miss is legible.
   const lit = phase === 'study' || phase === 'feedback' ? pattern : null
 
+  // The timer bar stays mounted for every phase — it drains during study, then
+  // sits empty through recall and feedback. Unmounting it would shrink the
+  // banner and jump the grid up the page mid-trial.
   return (
     <div className="memory">
       <PhaseBanner
@@ -71,7 +74,7 @@ export default function PatternMatrix({ difficulty, onFinish, onScore }) {
             ? `${taps.size} / ${pattern.size}`
             : `${pattern.size} cells · ${ladder.misses > 0 ? 'last life' : `${size}×${size}`}`
         }
-        timerMs={phase === 'study' ? studyMs : 0}
+        timerMs={studyMs}
         timerKey={trial}
       />
       <CellGrid

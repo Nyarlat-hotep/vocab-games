@@ -11,8 +11,8 @@ const FEEDBACK_MS = 700
 // Corsi block tapping. Cells light one at a time; tap them back in order —
 // reversed on hard, which is a materially different task, not just a faster one.
 export default function GridFlash({ difficulty, onFinish, onScore }) {
-  const { start, reverse, size, onMs, offMs } = paramsFor('gridflash', difficulty)
-  const ladder = useSpanLadder({ start })
+  const { start, max, reverse, size, onMs, offMs } = paramsFor('gridflash', difficulty)
+  const ladder = useSpanLadder({ start, max })
 
   // A fresh pattern per trial, including a retry at the same length. Held in
   // state and replaced when the trial advances, rather than memoized off a
@@ -67,6 +67,7 @@ export default function GridFlash({ difficulty, onFinish, onScore }) {
   }
 
   const lit = phase === 'watch' && player.phase === 'on' ? new Set([sequence[player.index]]) : null
+  const status = ladder.misses > 0 ? 'last life' : ladder.atMax ? 'max level' : `${size}×${size}`
 
   return (
     <div className="memory">
@@ -74,11 +75,7 @@ export default function GridFlash({ difficulty, onFinish, onScore }) {
         label={
           phase === 'watch' ? 'Watch' : phase === 'recall' ? (reverse ? 'Tap in reverse' : 'Tap in order') : verdict
         }
-        note={
-          phase === 'recall'
-            ? `${taps.size} / ${expected.length}`
-            : `Level ${ladder.level} · ${ladder.misses > 0 ? 'last life' : `${size}×${size}`}`
-        }
+        note={phase === 'recall' ? `${taps.size} / ${expected.length}` : `Level ${ladder.level} · ${status}`}
       />
       <CellGrid
         size={size}

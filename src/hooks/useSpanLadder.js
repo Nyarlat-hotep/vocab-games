@@ -4,9 +4,13 @@ import { useState } from 'react'
 // grows; miss and you get one retry at the same length; miss twice in a row and
 // the run is over.
 //
+// `max` caps how long the sequence gets. At the cap the run keeps going with
+// fresh sequences of that length — the climb turns into an endurance stretch
+// rather than ending — so the score is still the span reached.
+//
 // `best` is the highest level *completed*, so a player who never clears the
 // starting level scores 0 rather than the level they were shown.
-export function useSpanLadder({ start = 3, maxMisses = 2 } = {}) {
+export function useSpanLadder({ start = 3, max = Infinity, maxMisses = 2 } = {}) {
   const [level, setLevel] = useState(start)
   const [best, setBest] = useState(0)
   const [misses, setMisses] = useState(0)
@@ -17,7 +21,7 @@ export function useSpanLadder({ start = 3, maxMisses = 2 } = {}) {
   function succeed() {
     setBest(Math.max(best, level))
     setMisses(0)
-    setLevel(level + 1)
+    setLevel(Math.min(level + 1, max))
   }
 
   function fail() {
@@ -26,7 +30,7 @@ export function useSpanLadder({ start = 3, maxMisses = 2 } = {}) {
     if (next >= maxMisses) setOver(true)
   }
 
-  return { level, best, misses, over, succeed, fail }
+  return { level, best, misses, over, atMax: level >= max, succeed, fail }
 }
 
 export default useSpanLadder

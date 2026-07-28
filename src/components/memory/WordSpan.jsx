@@ -20,8 +20,8 @@ function makeTrial(difficulty, level, extraTiles) {
 // tile board padded with distractors — so recognising the words isn't enough,
 // you have to hold their order.
 export default function WordSpan({ difficulty, onFinish, onScore }) {
-  const { start, reverse, onMs, offMs, extraTiles } = paramsFor('wordspan', difficulty)
-  const ladder = useSpanLadder({ start })
+  const { start, max, reverse, onMs, offMs, extraTiles } = paramsFor('wordspan', difficulty)
+  const ladder = useSpanLadder({ start, max })
 
   const [trial, setTrial] = useState(() => makeTrial(difficulty, start, extraTiles))
   const [phase, setPhase] = useState('watch')
@@ -75,11 +75,12 @@ export default function WordSpan({ difficulty, onFinish, onScore }) {
 
   if (phase === 'watch' || phase === 'feedback') {
     const shown = phase === 'watch' && player.phase === 'on' ? trial.sequence[player.index] : ''
+    const status = ladder.misses > 0 ? 'last life' : ladder.atMax ? 'max level' : null
     return (
       <div className="memory">
         <PhaseBanner
           label={phase === 'watch' ? 'Remember' : verdict}
-          note={`Level ${ladder.level}${ladder.misses > 0 ? ' · last life' : ''}`}
+          note={`Level ${ladder.level}${status ? ` · ${status}` : ''}`}
         />
         <div className={`flashword flashword--${phase === 'feedback' ? verdict : 'idle'}`}>
           <span className="flashword__word">{phase === 'feedback' ? verdict : shown}</span>
