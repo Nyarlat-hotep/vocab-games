@@ -218,10 +218,22 @@ async function main() {
   saveCache(cache)
 
   // Assemble the shipped bank from the cache, applying difficulty from the seed.
+  //
+  // Only the first definition and first example ever reach the screen — see
+  // `firstDef` and `makeSentenceQuestion` in src/lib/bank.js — so the rest is
+  // dead weight in a bundle that vite-plugin-singlefile inlines whole. Trimming
+  // here rather than in fetchWord keeps the full records in the cache, so
+  // widening this later costs no API calls.
   const bank = []
   for (const { word, tier } of seed) {
     const c = cache[word]
-    if (c && !c.skip) bank.push({ ...c, difficulty: tier })
+    if (!c || c.skip) continue
+    bank.push({
+      ...c,
+      definitions: c.definitions.slice(0, 1),
+      examples: c.examples.slice(0, 1),
+      difficulty: tier,
+    })
   }
   writeFileSync(OUT_PATH, JSON.stringify(bank, null, 0) + '\n')
 
